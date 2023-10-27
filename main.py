@@ -1,69 +1,64 @@
+from tensorflowTesting import testing
+##import tensorflow as tf
+from keras.models import load_model
+import cv2
 import numpy as np
+import os
+
+from PIL import ImageTk, Image, ImageDraw
+import PIL
 import tkinter as tk
-from tkinter import Canvas
-from keras.datasets import mnist
-from keras.models import Sequential
-from keras.layers import Dense, Flatten
-from keras.utils import to_categorical
-from PIL import Image, ImageDraw
+from tkinter import *
 
-# Load and preprocess data
-(train_images, train_labels), _ = mnist.load_data()
-train_images = train_images / 255.0
-train_labels = to_categorical(train_labels)
-
-# Build and train a simple model
-model = Sequential([
-    Flatten(input_shape=(28, 28)),
-    Dense(128, activation='relu'),
-    Dense(10, activation='softmax')
-])
-model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
-model.fit(train_images, train_labels, epochs=5)
-
-def predict_digit(img):
-    # Convert image to array and preprocess
-    img = img.resize((28, 28))
-    img = img.convert('L')
-    img = np.array(img)
-    img = img.reshape(1, 28, 28)
-    img = 255 - img  # Invert colors
-    img = img / 255.0
-
-    # Predict the digit
-    pred = model.predict([img])
-    return np.argmax(pred)
-
-def on_submit():
-    global canvas, draw
-    img = Image.new("RGB", (500, 500), (255, 255, 255))
-    img.paste(Image.fromarray(np.array(canvas_image)))
-    digit = predict_digit(img)
-    label.config(text=f"Predicted Digit: {digit}")
-    canvas.delete("all")
-    canvas_image = Image.new("RGB", (500, 500), (255, 255, 255))
-    draw = ImageDraw.Draw(canvas_image)
+classes=[0,1,2,3,4,5,6,7,8,9]
+width = 500
+height = 500
+center = height//2
+white = (255, 255, 255)
+green = (0,128,0)
 
 def paint(event):
-    x, y = event.x, event.y
-    canvas.create_oval((x - 10, y - 10, x + 10, y + 10), fill='black', width=20)
-    draw.line([x, y, x, y], fill='black', width=20)
+    x1, y1 = (event.x - 10), (event.y - 10)
+    x2, y2 = (event.x + 10), (event.y + 10)
+    cv.create_oval(x1, y1, x2, y2, fill="black",width=40)
+    draw.line([x1, y1, x2, y2],fill="black",width=40)
+def model():
+    filename = "image.png"
+    image1.save(filename)
+    pred=testing()
+    print('argmax',np.argmax(pred[0]),'\n',
+          pred[0][np.argmax(pred[0])],'\n',classes[np.argmax(pred[0])])
+    txt.insert(tk.INSERT,"{}\nAccuracy: {}%".format(classes[np.argmax(pred[0])],round(pred[0][np.argmax(pred[0])]*100,3)))
+    
+def clear():
+    cv.delete('all')
+    draw.rectangle((0, 0, 500, 500), fill=(255, 255, 255, 0))
+    txt.delete('1.0', END)
 
-root = tk.Tk()
-root.title("Digit Recognizer")
+root = Tk()
+##root.geometry('1000x500') 
 
-canvas = Canvas(root, bg='white', width=500, height=500)
-canvas.pack(pady=20)
+root.resizable(0,0)
+cv = Canvas(root, width=width, height=height, bg='white')
+cv.pack()
 
-canvas.bind("<B1-Motion>", paint)
+# PIL create an empty image and draw object to draw on
+# memory only, not visible
+image1 = PIL.Image.new("RGB", (width, height), white)
+draw = ImageDraw.Draw(image1)
 
-canvas_image = Image.new("RGB", (500, 500), (255, 255, 255))
-draw = ImageDraw.Draw(canvas_image)
+txt=tk.Text(root,bd=3,exportselection=0,bg='WHITE',font='Helvetica',
+            padx=10,pady=10,height=5,width=20)
 
-submit_button = tk.Button(root, text="Predict", command=on_submit)
-submit_button.pack(pady=20)
+cv.pack(expand=YES, fill=BOTH)
+cv.bind("<B1-Motion>", paint)
 
-label = tk.Label(root, text="Draw a digit and click on Predict!")
-label.pack(pady=20)
-
+##button=Button(text="save",command=save)
+btnModel=Button(text="Predict",command=model)
+btnClear=Button(text="clear",command=clear)
+##button.pack()
+btnModel.pack()
+btnClear.pack()
+txt.pack()
+root.title('digit recognizer---- Shafin Hasnat')
 root.mainloop()
