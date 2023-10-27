@@ -16,3 +16,4 @@ A simple AI-powered GUI application that predicts handwritten digits. Using the 
 - Real-time prediction of handwritten digits using a trained neural network.
 - Simple and intuitive user interface.
 
+![9](https://github.com/kaashdesai123/Digit-Recognizer/assets/138083663/4db1ca43-f4a0-4789-93be-570f86dc3d46)
